@@ -68,7 +68,7 @@ class Pager extends sfPager
     {
         if ($this->query === null)
         {
-            throw new \Exception('You must specify a query');
+            throw new \InvalidArgumentException('You must specify a query');
         }
 
         

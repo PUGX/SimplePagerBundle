@@ -17,6 +17,14 @@ class PagerTest extends \PHPUnit_Framework_TestCase
         $this->pager = new Pager($this->getMock('Ideato\SimplePagerBundle\Pager\sfParameterHolder'), 4);
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testInitException()
+    {
+        $this->pager->init();
+    }
+
     public function testConstruct()
     {
         $this->assertEquals(4, $this->pager->getMaxPerPage());
@@ -77,14 +85,6 @@ class PagerTest extends \PHPUnit_Framework_TestCase
 
         $pager->setPage(5);
         $this->assertEquals(5, $pager->getNextPage());
-    }
-
-    /**
-     * @expectedException Exception
-     */
-    public function testInitException()
-    {
-        $this->pager->init();
     }
 
     protected function buildQueryMock($results, $set_getResult = true)
