@@ -1,0 +1,29 @@
+{
+    "name": "Ideato/SimplePagerBundle",
+    "type": "symfony-bundle",
+    "description": "sfPager port for Symfony2",
+    "keywords": ["pager", "pagination"],
+    "homepage": "https://github.com/ideatosrl",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien.potencier@symfony-project.com"
+        },
+		{
+            "name": "Filippo De Santis",
+            "email": "fd@ideato.it"
+        }
+        
+    ],
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "require-dev": {
+        "doctrine/orm": "*"
+    },
+    "autoload": {
+        "psr-0": { "Ideato\\SimplePagerBundle": "" }
+    },
+    "target-dir": "Ideato/SimplePagerBundle"
+}

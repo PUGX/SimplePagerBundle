@@ -91,7 +91,7 @@ class PagerTest extends \PHPUnit_Framework_TestCase
     {
         $query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')
                       ->disableOriginalConstructor()
-                      ->setMethods(array('setMaxResults', 'setFirstResult', 'execute', 'getResult', '_doExecute', 'getSQL'))
+                      ->setMethods(array('setMaxResults', 'setFirstResult', 'execute', 'getResult', '_doExecute', 'getSQL', 'setHint', 'getSingleScalarResult'))
                       ->getMock();
 
         if ($set_getResult)
@@ -366,5 +366,46 @@ class PagerTest extends \PHPUnit_Framework_TestCase
     public function testSetQueryException()
     {
         $this->pager->setQuery(new QueryStub);
+    }
+
+    public function testInitWithWalker()
+    {
+        $query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(array('_doExecute', 'getSQL', 'setMaxResults', 'setFirstResult', 'setHint', 'getSingleScalarResult', 'execute'))
+            ->getMock();
+
+
+        $query->expects($this->at(0))
+            ->method('setMaxResults')
+            ->will($this->returnValue($query));
+
+        $query->expects($this->at(1))
+            ->method('setFirstResult')
+            ->will($this->returnValue($query));
+
+        $query->expects($this->at(2))
+            ->method('execute')
+            ->will($this->returnValue($query));
+
+        $query->expects($this->at(3))
+            ->method('setHint')
+            ->with('doctrine.customTreeWalkers', array('Doctrine\ORM\Tools\Pagination\CountWalker'));
+
+        $query->expects($this->at(4))
+            ->method('setFirstResult')
+            ->with(null)
+            ->will($this->returnValue($query));
+
+        $query->expects($this->at(5))
+            ->method('setMaxResults')
+            ->with(null)
+            ->will($this->returnValue($query));
+
+        $pager= $this->buildExtendedPager($query);
+
+        $pager->setUseCountWalker(true);
+        $pager->setQuery($query);
+        $pager->init();
     }
 }

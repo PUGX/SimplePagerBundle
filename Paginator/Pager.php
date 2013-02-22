@@ -8,17 +8,21 @@ class Pager extends sfPager
 {
     private $query_class = 'Doctrine\ORM\AbstractQuery';
     private $query_scalar_hydration_mode = 'HYDRATE_SCALAR';
-    
+    private $use_count_walker = false;
+    private $count_walker_class = 'Doctrine\ORM\Tools\Pagination\CountWalker';
+    private $count_walker_hint = 'doctrine.customTreeWalkers';
+
     private $query = null;
 
     /**
      * Clone the query and then sets all the needed parameters
-     *
+     * @throw RuntimeException
      * @return mixed returns and object of class $query_class (default: Doctrine\ORM\AbstractQuery )
      */
     protected function cloneQuery()
     {
         $q = clone $this->query;
+
         $q->setParameters($this->query->getParameters());
 
         return $q;
@@ -71,10 +75,16 @@ class Pager extends sfPager
             throw new \InvalidArgumentException('You must specify a query');
         }
 
-        
         $this->getResults();
-        $nb_results = count($this->cloneQuery()->getResult($this->getScalarHydrationValue()));
+        $countQuery = $this->cloneQuery();
+        if (false === $this->use_count_walker) {
+            $nb_results = count($countQuery->getResult($this->getScalarHydrationValue()));
+        } else {
+            $countQuery->setHint($this->count_walker_hint, array($this->count_walker_class));
+            $countQuery->setFirstResult(null)->setMaxResults(null);
 
+            $nb_results = $countQuery->getSingleScalarResult();
+        }
         $this->setNbResults($nb_results);
         $this->setLastPage(ceil($this->nbResults / $this->maxPerPage));
     }
@@ -129,6 +139,34 @@ class Pager extends sfPager
         $this->query_scalar_hydration_mode = $query_scalar_hydration_mode;
     }
 
+    public function getUseCountWalker()
+    {
+        return $this->use_count_walker;
+    }
 
+    public function setUseCountWalker($use_count_walker)
+    {
+        $this->use_count_walker = $use_count_walker;
+    }
+
+    public function getCountWalkerClass()
+    {
+        return $this->count_walker_class;
+    }
+
+    public function setCountWalkerClass($count_walker_class)
+    {
+        $this->count_walker_class = $count_walker_class;
+    }
+
+    public function getCountWalkerHint()
+    {
+        return $this->count_walker_hint;
+    }
+
+    public function setCountWalkerHint($count_walker_hint)
+    {
+        $this->count_walker_hint = $count_walker_hint;
+    }
 
 }
